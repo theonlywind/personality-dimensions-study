@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>性格透視® (Personality Dimensions) 相處與協同研究互動報告</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: { DEFAULT: '#D97706', light: '#FEF3C7', dark: '#92400E', border: '#F59E0B' },
+                        orange: { DEFAULT: '#EA580C', light: '#FFEDD5', dark: '#9A3412', border: '#FB923C' },
+                        blue: { DEFAULT: '#0284C7', light: '#E0F2FE', dark: '#075985', border: '#38BDF8' },
+                        green: { DEFAULT: '#059669', light: '#D1FAE5', dark: '#065F46', border: '#34D399' },
+                        warm: { 50: '#FAF8F5', 100: '#F4EFE6', 200: '#E8DEC9', 800: '#4A4238', 900: '#2C251E' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 340px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 380px;
+            }
+        }
+        .tab-btn.active-gold { background-color: #FEF3C7; color: #92400E; border-color: #D97706; font-weight: bold; }
+        .tab-btn.active-orange { background-color: #FFEDD5; color: #9A3412; border-color: #EA580C; font-weight: bold; }
+        .tab-btn.active-blue { background-color: #E0F2FE; color: #075985; border-color: #0284C7; font-weight: bold; }
+        .tab-btn.active-green { background-color: #D1FAE5; color: #065F46; border-color: #059669; font-weight: bold; }
+    </style>
+</head>
+<!-- Chosen Palette: Warm Neutral Harmonized with Personality Dimensions Signature Colors (Gold, Orange, Blue, Green) -->
+<!-- Application Structure Plan:
+     1. Navigation Bar & Hero Section: Brief intro to Personality Dimensions, Lynda McKim's research, and the Tartan/Plaid metaphor.
+     2. Color Spectrum Explorer (四種氣質色彩深度探索): Interactive cards and comparison Radar/Bar chart showing core psychological needs, stress triggers, and communication styles.
+     3. Interpersonal Dynamic Pairing Matrix (兩兩相處動態與解構): Interactive selector to pick two colors and analyze their specific pairing dynamics (e.g. Diamond, Firecracker, Sunburst, Mystic), friction points, and synergy tactics.
+     4. Practical Communication & Adaptation Playbook (跨性格高效溝通與相處指南): Categorized actionable DOs and DON'Ts for each personality color.
+     5. Organizational & Lifecycle Application (組織應用與專案協同):
+        - Extraversion/Introversion (E/I) Modifiers dynamic toggle.
+        - Interactive Project Lifecycle Simulator showing role handoffs (Green -> Blue -> Gold -> Orange).
+        - Conflict De-escalation & Mediation step-by-step framework.
+-->
+<!-- Visualization & Content Choices:
+     - Radar Chart (Chart.js): Compares the 4 colors across key dimensions (Order, Agility, Empathy, Logic, Autonomy).
+     - Pair Compatibility Dynamic Cards: Visual interactive lookup table without SVG or Mermaid JS.
+     - Interactive E/I Modifiers: Dynamic toggle buttons displaying behavioral shifts.
+     - Project Stage Timeline: HTML/Tailwind step card list with real-time detail updates.
+-->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<body class="bg-warm-50 text-warm-900 font-sans antialiased leading-relaxed">
+
+    <!-- Header / Navigation -->
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-warm-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-amber-600 via-orange-600 to-emerald-600">性格透視®</span>
+                <span class="hidden sm:inline-block text-xs px-2.5 py-1 rounded-full bg-warm-100 text-warm-800 font-medium">相處與協同研究</span>
+            </div>
+            <nav class="hidden md:flex space-x-6 text-sm font-medium text-warm-800">
+                <a href="#overview" class="hover:text-amber-600 transition">理論淵源</a>
+                <a href="#spectrum" class="hover:text-amber-600 transition">色彩氣質</a>
+                <a href="#matrix" class="hover:text-amber-600 transition">相處動態</a>
+                <a href="#playbook" class="hover:text-amber-600 transition">溝通指南</a>
+                <a href="#organization" class="hover:text-amber-600 transition">組織應用</a>
+            </nav>
+            <a href="#matrix" class="inline-flex items-center px-4 py-2 border border-transparent text-xs font-semibold rounded-lg text-white bg-amber-600 hover:bg-amber-700 shadow-sm transition">
+                對攻相處矩陣
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
+
+        <!-- HERO & OVERVIEW SECTION -->
+        <section id="overview" class="bg-white rounded-2xl p-6 md:p-10 shadow-sm border border-warm-200">
+            <div class="max-w-3xl">
+                <span class="text-xs font-bold uppercase tracking-wider text-amber-600">Personality Dimensions® Research</span>
+                <h1 class="text-3xl md:text-4xl font-extrabold text-warm-900 mt-2 mb-4">氣質光譜、人際動力與跨性格協同相處策略</h1>
+                <p class="text-warm-800 text-base md:text-lg mb-6 leading-relaxed">
+                    性格透視（Personality Dimensions®）由加拿大諮商專家琳達·麥金（Lynda McKim）於 2003 年研發，承襲卡爾·榮格（Carl Jung）的心理類型論與大衛·凱爾西（Keirsey）的四大氣質分類學。本報告聚焦於如何理解四種色彩的深層心理飢渴，並在人際互動與團隊協同中轉化衝突為戰術資產。
+                </p>
+            </div>
+
+            <!-- Key Concepts Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 pt-8 border-t border-warm-100">
+                <div class="p-4 rounded-xl bg-warm-50 border border-warm-200">
+                    <div class="text-amber-600 font-bold text-lg mb-1">🏁 蘇格蘭格紋 (Plaid) 隱喻</div>
+                    <p class="text-xs text-warm-800 leading-normal">拒絕非黑即白的標籤。每個人皆擁有全部四種色彩，獨特性源於優勢順序與顯隱強度的交織組合。</p>
+                </div>
+                <div class="p-4 rounded-xl bg-warm-50 border border-warm-200">
+                    <div class="text-amber-600 font-bold text-lg mb-1">⚡ 榮格 E/I 能量軸整合</div>
+                    <p class="text-xs text-warm-800 leading-normal">將「外向與內向」實質融入氣質評估，揭示同一色彩在面對外在刺激與內部反思時的截然不同表現。</p>
+                </div>
+                <div class="p-4 rounded-xl bg-warm-50 border border-warm-200">
+                    <div class="text-amber-600 font-bold text-lg mb-1">🕊️ 去個人化 (Depersonalization)</div>
+                    <p class="text-xs text-warm-800 leading-normal">衝突往往非出於惡意，而是源於底層「心理飢渴」受挫後的本能防禦。理解差異即可調降敵意。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- COLOR SPECTRUM SECTION -->
+        <section id="spectrum" class="space-y-6">
+            <div class="border-l-4 border-amber-500 pl-4">
+                <h2 class="text-2xl font-bold text-warm-900">四種性格色彩的深層心理動力學</h2>
+                <p class="text-warm-800 text-sm mt-1">
+                    本區塊展示四種性格色彩的核心心理特徵、代表符號、氣質對應與強項短板。請點選下方切換頁標以深入探討不同色彩，並透過動態雷達圖比較各維度差異。
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <!-- Interactive Color Cards Column -->
+                <div class="lg:col-span-7 space-y-4">
+                    <!-- Tab Buttons -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <button onclick="selectColor('gold')" id="btn-gold" class="tab-btn active-gold border py-3 px-3 rounded-xl text-center text-xs sm:text-sm font-semibold transition flex flex-col items-center justify-center space-y-1 shadow-sm">
+                            <span class="text-lg">✓</span>
+                            <span>金色組織型</span>
+                        </button>
+                        <button onclick="selectColor('orange')" id="btn-orange" class="tab-btn border py-3 px-3 rounded-xl text-center text-xs sm:text-sm font-semibold text-warm-800 hover:bg-orange-light transition flex flex-col items-center justify-center space-y-1 shadow-sm">
+                            <span class="text-lg">!</span>
+                            <span>橙色多谋型</span>
+                        </button>
+                        <button onclick="selectColor('blue')" id="btn-blue" class="tab-btn border py-3 px-3 rounded-xl text-center text-xs sm:text-sm font-semibold text-warm-800 hover:bg-blue-light transition flex flex-col items-center justify-center space-y-1 shadow-sm">
+                            <span class="text-lg">🤝</span>
+                            <span>藍色真我型</span>
+                        </button>
+                        <button onclick="selectColor('green')" id="btn-green" class="tab-btn border py-3 px-3 rounded-xl text-center text-xs sm:text-sm font-semibold text-warm-800 hover:bg-green-light transition flex flex-col items-center justify-center space-y-1 shadow-sm">
+                            <span class="text-lg">?</span>
+                            <span>綠色探究型</span>
+                        </button>
+                    </div>
+
+                    <!-- Dynamic Card Content Container -->
+                    <div id="color-detail-card" class="bg-white rounded-2xl p-6 border border-amber-200 shadow-sm transition-all duration-300">
+                        <!-- Content populated dynamically via JS -->
+                    </div>
+                </div>
+
+                <!-- Visualization Column -->
+                <div class="lg:col-span-5 bg-white rounded-2xl p-6 border border-warm-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-base font-bold text-warm-900 mb-2">四種色彩氣質維度雷達比對</h3>
+                        <p class="text-xs text-warm-800 mb-4">比對各氣質在「秩序與SOP」、「敏捷應變」、「同理共鳴」、「系統邏輯」及「自主獨立」上的側重點。</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="colorRadarChart"></canvas>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-warm-100 text-xs text-warm-800 text-center">
+                        💡 提示：點擊圖例可隱藏或顯示特定色彩進行單獨比對。
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- INTERPERSONAL DYNAMIC PAIRING MATRIX -->
+        <section id="matrix" class="space-y-6">
+            <div class="border-l-4 border-orange-500 pl-4">
+                <h2 class="text-2xl font-bold text-warm-900">兩兩相處之動態機制與對攻解構</h2>
+                <p class="text-warm-800 text-sm mt-1">
+                    不同氣質色彩相遇時會碰撞出獨特的互動模式。請選擇兩種色彩，系統將解構其組合象徵、潛在摩擦點以及具體的調適相處策略。
+                </p>
+            </div>
+
+            <!-- Dynamic Pair Selector Workspace -->
+            <div class="bg-white rounded-2xl p-6 md:p-8 border border-warm-200 shadow-sm">
+                <!-- Color Selectors Row -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-8 mb-8 pb-6 border-b border-warm-100">
+                    <!-- Person A Selection -->
+                    <div class="w-full sm:w-1/3">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-warm-800 mb-2">角色 A 性格色彩</label>
+                        <select id="select-color-a" onchange="updatePairAnalysis()" class="w-full p-3 bg-warm-50 border border-warm-200 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                            <option value="gold" selected>金色組織型 (Organized Gold)</option>
+                            <option value="orange">橙色多謀型 (Resourceful Orange)</option>
+                            <option value="blue">藍色真我型 (Authentic Blue)</option>
+                            <option value="green">綠色探究型 (Inquiring Green)</option>
+                        </select>
+                    </div>
+
+                    <div class="text-2xl font-black text-warm-800 flex items-center justify-center rounded-full bg-warm-100 w-10 h-10">✕</div>
+
+                    <!-- Person B Selection -->
+                    <div class="w-full sm:w-1/3">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-warm-800 mb-2">角色 B 性格色彩</label>
+                        <select id="select-color-b" onchange="updatePairAnalysis()" class="w-full p-3 bg-warm-50 border border-warm-200 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                            <option value="orange" selected>橙色多謀型 (Resourceful Orange)</option>
+                            <option value="gold">金色組織型 (Organized Gold)</option>
+                            <option value="blue">藍色真我型 (Authentic Blue)</option>
+                            <option value="green">綠色探究型 (Inquiring Green)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Analysis Result Card -->
+                <div id="pair-analysis-result" class="space-y-6">
+                    <!-- JS populates pairing data here -->
+                </div>
+            </div>
+
+            <!-- Quick Matrix Lookup Table -->
+            <div class="bg-warm-100 rounded-2xl p-6 border border-warm-200">
+                <h3 class="text-base font-bold text-warm-900 mb-3">經典對攻配對速查表</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <button onclick="setPair('gold', 'green')" class="bg-white p-3 rounded-xl border border-warm-200 hover:border-amber-500 text-left transition shadow-xs">
+                        <span class="text-xs font-bold text-amber-700 block">💎 鑽石 (Diamond) 組合</span>
+                        <span class="text-sm font-semibold text-warm-900">金色 × 綠色</span>
+                        <p class="text-xs text-warm-800 mt-1">戰略架構與高品質落地執行的完美結合。</p>
+                    </button>
+                    <button onclick="setPair('orange', 'green')" class="bg-white p-3 rounded-xl border border-warm-200 hover:border-orange-500 text-left transition shadow-xs">
+                        <span class="text-xs font-bold text-orange-700 block">🧨 爆竹 (Firecracker) 組合</span>
+                        <span class="text-sm font-semibold text-warm-900">橙色 × 綠色</span>
+                        <p class="text-xs text-warm-800 mt-1">極速破局實踐力與深層邏輯推演的碰撞。</p>
+                    </button>
+                    <button onclick="setPair('orange', 'blue')" class="bg-white p-3 rounded-xl border border-warm-200 hover:border-blue-500 text-left transition shadow-xs">
+                        <span class="text-xs font-bold text-blue-700 block">☀️ 陽光 (Sunburst) 組合</span>
+                        <span class="text-sm font-semibold text-warm-900">橙色 × 藍色</span>
+                        <p class="text-xs text-warm-800 mt-1">感官活力驅散內耗，人文關懷賦予行動深度。</p>
+                    </button>
+                    <button onclick="setPair('blue', 'green')" class="bg-white p-3 rounded-xl border border-warm-200 hover:border-emerald-500 text-left transition shadow-xs">
+                        <span class="text-xs font-bold text-emerald-700 block">🔮 神秘家 (Mystic) 組合</span>
+                        <span class="text-sm font-semibold text-warm-900">藍色 × 綠色</span>
+                        <p class="text-xs text-warm-800 mt-1">嚴密客觀邏輯與深層人本精神共鳴。</p>
+                    </button>
+                    <button onclick="setPair('gold', 'orange')" class="bg-white p-3 rounded-xl border border-warm-200 hover:border-amber-500 text-left transition shadow-xs">
+                        <span class="text-xs font-bold text-amber-800 block">⚖️ 穩健 vs 破局</span>
+                        <span class="text-sm font-semibold text-warm-900">金色 × 橙色</span>
+                        <p class="text-xs text-warm-800 mt-1">結構保護者與即時突破者的規律拉鋸。</p>
+                    </button>
+                    <button onclick="setPair('gold', 'blue')" class="bg-white p-3 rounded-xl border border-warm-200 hover:border-amber-500 text-left transition shadow-xs">
+                        <span class="text-xs font-bold text-sky-800 block">🛡️ 剛柔互濟</span>
+                        <span class="text-sm font-semibold text-warm-900">金色 × 藍色</span>
+                        <p class="text-xs text-warm-800 mt-1">制度規範框架與組織人文凝聚力的平衡。</p>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRACTICAL COMMUNICATION PLAYBOOK -->
+        <section id="playbook" class="space-y-6">
+            <div class="border-l-4 border-blue-500 pl-4">
+                <h2 class="text-2xl font-bold text-warm-900">跨性格高效溝通與相處實務指南</h2>
+                <p class="text-warm-800 text-sm mt-1">
+                    了解對方的性格色彩後，如何在日常協作、反饋給予及任務委派中調整溝通姿態？請點選下方色彩標籤切換對應策略。
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 md:p-8 border border-warm-200 shadow-sm space-y-6">
+                <!-- Color Target Selector -->
+                <div class="flex flex-wrap gap-2 border-b border-warm-100 pb-4">
+                    <button onclick="showPlaybook('gold')" id="pb-btn-gold" class="px-4 py-2 rounded-lg font-semibold text-xs sm:text-sm bg-amber-100 text-amber-900 border border-amber-300">
+                        與 金色組織型 相處
+                    </button>
+                    <button onclick="showPlaybook('orange')" id="pb-btn-orange" class="px-4 py-2 rounded-lg font-semibold text-xs sm:text-sm bg-warm-100 text-warm-700 hover:bg-orange-100 border border-warm-200">
+                        與 橙色多謀型 相處
+                    </button>
+                    <button onclick="showPlaybook('blue')" id="pb-btn-blue" class="px-4 py-2 rounded-lg font-semibold text-xs sm:text-sm bg-warm-100 text-warm-700 hover:bg-blue-100 border border-warm-200">
+                        與 藍色真我型 相處
+                    </button>
+                    <button onclick="showPlaybook('green')" id="pb-btn-green" class="px-4 py-2 rounded-lg font-semibold text-xs sm:text-sm bg-warm-100 text-warm-700 hover:bg-green-100 border border-warm-200">
+                        與 綠色探究型 相處
+                    </button>
+                </div>
+
+                <!-- Playbook Content Display -->
+                <div id="playbook-content">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ORGANIZATIONAL & LIFECYCLE APPLICATION -->
+        <section id="organization" class="space-y-6">
+            <div class="border-l-4 border-emerald-500 pl-4">
+                <h2 class="text-2xl font-bold text-warm-900">組織應用、內外向調節與衝突管理</h2>
+                <p class="text-warm-800 text-sm mt-1">
+                    將性格透視運用於團隊專案生命週期、能量維度調節以及深度衝突降階調解。
+                </p>
+            </div>
+
+            <!-- E/I Modifiers Interactive Interactive Box -->
+            <div class="bg-white rounded-2xl p-6 border border-warm-200 shadow-sm">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                    <div>
+                        <h3 class="text-lg font-bold text-warm-900">榮格 E/I (外向 / 內向) 能量維度調節器</h3>
+                        <p class="text-xs text-warm-800 mt-1">同一個色彩在「外向心理能量」與「內向心理能量」下的不同行為表現。</p>
+                    </div>
+                    <!-- Switch Toggle -->
+                    <div class="flex items-center bg-warm-100 p-1 rounded-xl border border-warm-200">
+                        <button id="ei-extravert-btn" onclick="toggleEI('extravert')" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-white text-warm-900 shadow-xs">
+                            外向型 (Extravert)
+                        </button>
+                        <button id="ei-introvert-btn" onclick="toggleEI('introvert')" class="px-4 py-1.5 rounded-lg text-xs font-bold text-warm-800 hover:text-warm-900">
+                            內向型 (Introvert)
+                        </button>
+                    </div>
+                </div>
+
+                <div id="ei-content-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Project Lifecycle Synergy Simulator -->
+            <div class="bg-white rounded-2xl p-6 md:p-8 border border-warm-200 shadow-sm space-y-6">
+                <div>
+                    <h3 class="text-lg font-bold text-warm-900">專案生命週期中的「全光譜接力」生態</h3>
+                    <p class="text-xs text-warm-800 mt-1">點擊專案發展的不同階段，檢視哪種性格色彩最適合擔當領航角色，以及如何進行跨階段交接。</p>
+                </div>
+
+                <!-- Timeline Steps -->
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                    <button onclick="showProjectStage(1)" id="proj-stage-1" class="p-3 text-left rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900">
+                        <span class="text-xs font-bold block text-emerald-700">階段 1</span>
+                        <span class="text-sm font-bold">戰略定義與概念</span>
+                    </button>
+                    <button onclick="showProjectStage(2)" id="proj-stage-2" class="p-3 text-left rounded-xl border border-warm-200 bg-warm-50 text-warm-800 hover:bg-warm-100">
+                        <span class="text-xs font-bold block text-warm-800">階段 2</span>
+                        <span class="text-sm font-bold">團隊共識與動員</span>
+                    </button>
+                    <button onclick="showProjectStage(3)" id="proj-stage-3" class="p-3 text-left rounded-xl border border-warm-200 bg-warm-50 text-warm-800 hover:bg-warm-100">
+                        <span class="text-xs font-bold block text-warm-800">階段 3</span>
+                        <span class="text-sm font-bold">流程落地與風控</span>
+                    </button>
+                    <button onclick="showProjectStage(4)" id="proj-stage-4" class="p-3 text-left rounded-xl border border-warm-200 bg-warm-50 text-warm-800 hover:bg-warm-100">
+                        <span class="text-xs font-bold block text-warm-800">階段 4</span>
+                        <span class="text-sm font-bold">敏捷攻堅與突破</span>
+                    </button>
+                </div>
+
+                <!-- Stage Detail Display Container -->
+                <div id="project-stage-detail" class="p-6 rounded-xl bg-warm-50 border border-warm-200">
+                    <!-- JS populated -->
+                </div>
+            </div>
+
+            <!-- Conflict De-escalation & Mediation Protocol -->
+            <div class="bg-gradient-to-r from-warm-800 to-warm-900 text-white rounded-2xl p-6 md:p-8 shadow-sm space-y-4">
+                <div class="flex items-center space-x-2 text-amber-400 font-bold text-xs uppercase tracking-wider">
+                    <span>🛡️ Mediation Protocol</span>
+                </div>
+                <h3 class="text-xl font-extrabold">基於深層心理飢渴的「衝突調解三部曲」</h3>
+                <p class="text-warm-200 text-xs sm:text-sm leading-relaxed max-w-3xl">
+                    當人際摩擦演變為內耗時，調解者切勿將責任歸咎於個人道德問題，而應引導當事人回到「氣質需求受挫」的心理現實，並進行雙軌利益重構。
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
+                    <div class="bg-white/10 backdrop-blur p-4 rounded-xl border border-white/10 space-y-2">
+                        <span class="text-amber-400 font-bold text-xs">STEP 1</span>
+                        <h4 class="font-bold text-sm">氣質動機還原</h4>
+                        <p class="text-xs text-warm-200">還原行為動機。讓金色理解橙色的變通是抓時機，讓藍色理解綠色的批判是抓漏洞，剔除惡意定性。</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur p-4 rounded-xl border border-white/10 space-y-2">
+                        <span class="text-amber-400 font-bold text-xs">STEP 2</span>
+                        <h4 class="font-bold text-sm">心理安全區設立</h4>
+                        <p class="text-xs text-warm-200">為金色設風控底線、為橙色設自主特區、為藍色設傾聽窗口、為綠色設論證空間，確保各方底線。</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur p-4 rounded-xl border border-white/10 space-y-2">
+                        <span class="text-amber-400 font-bold text-xs">STEP 3</span>
+                        <h4 class="font-bold text-sm">雙軌利益互補契約</h4>
+                        <p class="text-xs text-warm-200">簽訂可操作的合作契約（如：橙色承諾關鍵交期，金色承諾中間過程不微觀干涉），將差異轉化為能力組合。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-warm-100 border-t border-warm-200 mt-16 py-8 text-center text-xs text-warm-800">
+        <div class="max-w-7xl mx-auto px-4">
+            <p class="font-semibold text-warm-900">性格透視® (Personality Dimensions) 人際動力與相處研究報告</p>
+            <p class="mt-1 text-warm-800">基於 Lynda McKim (2003) 氣質心理學模型、Carl Jung 心理類型論與 David Keirsey 氣質分類學。</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Data Store for Personality Colors
+        const colorData = {
+            gold: {
+                name: '金色組織型 (Organized Gold)',
+                symbol: '勾號 (✓) / 海狸 (Beaver)',
+                keirsey: 'Keirsey Guardian (保護者 / SJ)',
+                coreNeed: '體制歸屬感、維護秩序、履行社會責任義務',
+                value: '忠誠守信、實踐務實、程序可預測性',
+                cognition: '依循具體經驗、歷史參照與標準規章 (SOP)',
+                stressTrigger: '秩序失控、體制混亂、權責不清、被排擠在體制外',
+                stressBehavior: '焦慮控制、微觀干涉、僵化固執、教條主義',
+                radarScores: [95, 30, 50, 70, 40] // Order, Agility, Empathy, Logic, Autonomy
+            },
+            orange: {
+                name: '橙色多謀型 (Resourceful Orange)',
+                symbol: '驚嘆號 (!) / 敏捷獵犬或獵鷹',
+                keirsey: 'Keirsey Artisan (技藝者 / SP)',
+                coreNeed: '當下行動的自由、創造即時衝擊力、競爭刺激',
+                value: '機敏巧思、情境適應力、靈活多樣性',
+                cognition: '專注當前資源、戰術破局與即刻成效，試錯微調',
+                stressTrigger: '繁瑣規章、行動受限、拖沓等待、枯燥重複勞動',
+                stressBehavior: '衝動對抗、逃避承諾、尋求感官宣洩、公然挑戰權威',
+                radarScores: [25, 95, 45, 60, 85]
+            },
+            blue: {
+                name: '藍色真我型 (Authentic Blue)',
+                symbol: '互握之手 / 海豚 (Dolphin)',
+                keirsey: 'Keirsey Idealist (理想者 / NF)',
+                coreNeed: '追尋真實自我、生命意義、建立深度情感共鳴',
+                value: '真誠無偽、同理共感、人本協調、利他關懷',
+                cognition: '考量群體感受、人道價值與和諧信任關係',
+                stressTrigger: '人際衝突、背叛不公、批判指責、毀滅性內疚感',
+                stressBehavior: '情感退縮、過度自責、被動逃避、為表面和睦而過度妥協',
+                radarScores: [40, 50, 95, 40, 50]
+            },
+            green: {
+                name: '綠色探究型 (Inquiring Green)',
+                symbol: '問號 (?) / 貓頭鷹 (Owl)',
+                keirsey: 'Keirsey Rational (理性者 / NT)',
+                coreNeed: '智識精通、專業能力認同、獨立自主',
+                value: '邏輯自洽、戰略效率、創新洞察、追求真理',
+                cognition: '聚焦抽象模型、因果結構與全局戰略 (Big Picture)',
+                stressTrigger: '遭遇無能、邏輯破綻、強加教條、思維時間被壓縮',
+                stressBehavior: '傲慢反諷、分析癱瘓 (Analysis Paralysis)、抽離冷漠',
+                radarScores: [50, 60, 30, 95, 90]
+            }
+        };
+
+        // Data Store for Pairings
+        const pairData = {
+            'gold-orange': {
+                title: '程序正義 vs 靈活破局 (金色 × 橙色)',
+                synergy: '金色為橙色築起合規基底與後勤保障；橙色為金色注入突發危機的即時應變能力，打破體制僵化。',
+                friction: '時間觀念與規則邊界衝突。金色嚴守既定排程與規範，橙色視時間為彈性區間並常繞過SOP，易引發金色焦慮與橙色反抗。',
+                strategy: '【底線授權法】金色僅鎖定核心交付期與不可逾越的底線，過程放權；橙色恪守關鍵交期承諾，異動提前報備。'
+            },
+            'gold-green': {
+                title: '鑽石 (Diamond) 組合：歷史經驗 vs 理性重構 (金色 × 綠色)',
+                synergy: '具備高度價值與剛性品質。綠色提供前瞻戰略模型與技術創新，金色精於落地為組織流程與甘特圖。',
+                friction: '傳統體制權威 vs 底層邏輯質疑。金色敬重前人經驗與體制，綠色天生懷疑並重審規則，易演變為質疑與保守防禦。',
+                strategy: '【數據驗證法】綠色以數據與利弊分析論證變革效益，分步推進；金色保持開放心態容納系統優化方案。'
+            },
+            'gold-blue': {
+                title: '剛柔互濟：制度法度 vs 人道關懷 (金色 × 藍色)',
+                synergy: '金色提供明確分工與安全感，化解藍色對行政細節的焦慮；藍色為嚴密體系注入同理心與人文溫度。',
+                friction: '「對事」與「對人」的範式衝突。金色主張法不容情與統一準繩，藍色強調個體特殊困境與彈性，易指責對方冷酷或感情用事。',
+                strategy: '【先情後理法】金色溝通時先確立情感信任再切入事務；藍色理解制度乃是保護全體成員安全的防線。'
+            },
+            'orange-green': {
+                title: '爆竹 (Firecracker) 組合：敏捷實踐 vs 深層推演 (橙色 × 綠色)',
+                synergy: '極富智謀與破壞式創新能量。綠色建構戰略宏圖，橙色以強大行動力與現場談判快速轉化為成果。',
+                friction: '推進步調失衡。「做中學（試錯）」與「謀定而後動（推演）」的衝突。橙色耐不住長期推導，綠色蔑視冒進短視。',
+                strategy: '【小步快跑法】綠色精簡理論驗證並提供階段性模型；橙色尊重全局框架並提供即時市場/現場反饋。'
+            },
+            'orange-blue': {
+                title: '陽光 (Sunburst) 組合：感官快節奏 vs 心靈深度 (橙色 × 藍色)',
+                synergy: '充滿生命熱情與活力。橙色的幽默與冒險化解藍色的精神內耗；藍色賦予橙色情感共鳴與人道深度。',
+                friction: '無心調侃刺傷情感。橙色隨興態度易刺傷藍色敏感防線；受傷藍色的嚴肅問責常使厭惡沉重的橙色選擇逃避閃爍。',
+                strategy: '【邊界清晰法】橙色學會辨識對方情感邊界不開過頭玩笑；藍色減少過度解讀，以具體需求取代道德性控訴。'
+            },
+            'blue-green': {
+                title: '神秘家 (Mystic) 組合：同理共感 vs 客觀理性 (藍色 × 綠色)',
+                synergy: '思想深度與人文關懷的結合。綠色邏輯幫助藍色釐清人際糾葛與邊界；藍色為綠色提供人文視角與道德直覺。',
+                friction: '思考與情感（Thinking vs Feeling）的核心對立。綠色客觀批判被藍色視為人格否定；藍色情感訴求被綠色視為缺乏邏輯。',
+                strategy: '【結構化同理】綠色反饋時先給予肯定與同理語境；藍色陳述訴求時輔以客觀事實與因果推導。'
+            }
+        };
+
+        // Data Store for Playbook
+        const playbookData = {
+            gold: {
+                title: '與金色組織型 (Organized Gold) 的高效相處',
+                dos: [
+                    '恪守時間承諾與會議排程，嚴守契約精神。',
+                    '提供條理清晰、數據具體、含甘特圖與權責矩陣的書面方案。',
+                    '提議變更時，強調「在現有成功制度基礎上的漸進優化」。',
+                    '在公開場合對其維護秩序、防範風險的默默貢獻給予具體確認。'
+                ],
+                donts: [
+                    '切忌突發性改變計畫而不提供預警與補救方案。',
+                    '避免給出模糊空泛、缺乏執行時間表與驗收標準的指令。',
+                    '切勿公開挑戰既有體制權威或無視標準作業程序 (SOP)。'
+                ]
+            },
+            orange: {
+                title: '與橙色多謀型 (Resourceful Orange) 的高效相處',
+                dos: [
+                    '溝通直奔主題、結論先行，說明核心收益與底線。',
+                    '採用「管結果、放過程」模式，給予執行彈性與自主權。',
+                    '將長遠專案拆解為短期衝刺（Sprints），導入良性競爭機制。',
+                    '遭遇突發危機時，授權其赴前線進行資源調配與談判破局。'
+                ],
+                donts: [
+                    '切忌以繁文縟節、冗長背景說明或教條朗讀浪費其時間。',
+                    '避免微觀干涉其工作步驟或強加死板的過程審查。',
+                    '切勿將其臨場發揮與變通直接定性為「不負責任」。'
+                ]
+            },
+            blue: {
+                title: '與藍色真我型 (Authentic Blue) 的高效相處',
+                dos: [
+                    '「先通情後達理」，切入正題前進行真誠的情感關懷。',
+                    '展現積極傾聽，透過眼神與語氣回應 confirm 其感受被接納。',
+                    '反饋缺點時採用「肯定動機 → 聚焦行為改善 → 情感支持」夾心法。',
+                    '強調其工作對他人生命、團隊文化與社群的深遠意義。'
+                ],
+                donts: [
+                    '切忌以冰冷、突兀或全盤否定的直球批判進行言語打擊。',
+                    '避免在溝通中展現冷漠疏離或無視團隊的人際情緒氣候。',
+                    '切勿逼迫其在公開場合進行傷害人際和諧的殘酷對峙。'
+                ]
+            },
+            green: {
+                title: '與綠色探究型 (Inquiring Green) 的高效相處',
+                dos: [
+                    '以客觀數據、嚴密邏輯模型與利弊評估說服對方。',
+                    '給予充裕的獨立思維時間，預留無聲消化海量資料的窗口。',
+                    '將其犀利質疑視為「追求系統完美」的就事論事，理性辯證。',
+                    '尊重其專業權威，在抽象戰略與底層架構設計上請其領航。'
+                ],
+                donts: [
+                    '切忌以「過往皆如此」的經驗主義或感情綁架進行說服。',
+                    '避免過度頻繁的進度叩問與微觀干擾，這會被視為對能力的不信任。',
+                    '切勿在邏輯漏洞百出的情況下強行定案推行。'
+                ]
+            }
+        };
+
+        // Data Store for EI Modifiers
+        const eiData = {
+            extravert: [
+                { color: '金色', text: '主動發起規章建立，透過清晰口頭指令與會議維護秩序。' },
+                { color: '橙色', text: '前線破局者，具社交感染力，熱衷眾人矚目中的競爭。' },
+                { color: '藍色', text: '熱情的團隊激勵師、公關協調員，主動發起情感連結。' },
+                { color: '綠色', text: '熱衷發起公開智識辯論、學術佈道與戰略演說。' }
+            ],
+            introvert: [
+                { color: '金色', text: '幕後默不作聲落實嚴密行政排程、財務審計與風控核查。' },
+                { color: '橙色', text: '冷靜精準的操作行家、獨行俠般的技術調研員或專家。' },
+                { color: '藍色', text: '以深沉書面表達、一對一深度傾聽與精神省思見長。' },
+                { color: '綠色', text: '深居簡出架構師，在私密空間構建精密哲學或代碼模型。' }
+            ]
+        };
+
+        // Data Store for Project Lifecycle Stages
+        const projectStages = {
+            1: {
+                color: '綠色探究型 (Inquiring Green) 主導',
+                title: '階段 1：戰略定義與概念構想期',
+                desc: '探測行業底層邏輯、辨識技術盲點並完成整體的系統模型設計。',
+                action: '產出高質量的戰略白皮書與技術架構，確定專案的可行性與客觀邏輯。'
+            },
+            2: {
+                color: '藍色真我型 (Authentic Blue) 主導',
+                title: '階段 2：團隊共識與文化動員期',
+                desc: '將冰冷的技術架構轉化為激勵人心的願景，凝聚全員價值認同。',
+                action: '化解跨部門人際阻力，建立團隊情感信任與溝通承諾。'
+            },
+            3: {
+                color: '金色組織型 (Organized Gold) 主導',
+                title: '階段 3：流程落地與資源排程期',
+                desc: '將宏觀願景精確拆解為詳細的執行預算、甘特圖與風控節點。',
+                action: '確立標準作業程序 (SOP) 與審核機制，確保專案推進有法可依。'
+            },
+            4: {
+                color: '橙色多謀型 (Resourceful Orange) 主導',
+                title: '階段 4：敏捷攻堅與戰術突圍期',
+                desc: '擔任先鋒，在一線動態調配資源、化解突發危機。',
+                action: '以無畏的實踐魄力推動專案達成具體突破，快速交付成果。'
+            }
+        };
+
+        // Chart Instance Global Variable
+        let radarChartInstance = null;
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', () => {
+            initRadarChart();
+            selectColor('gold');
+            updatePairAnalysis();
+            showPlaybook('gold');
+            toggleEI('extravert');
+            showProjectStage(1);
+        });
+
+        // 1. Radar Chart Setup
+        function initRadarChart() {
+            const ctx = document.getElementById('colorRadarChart').getContext('2d');
+            radarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['秩序SOP', '敏捷應變', '同理共鳴', '系統邏輯', '自主獨立'],
+                    datasets: [
+                        { label: '金色', data: colorData.gold.radarScores, backgroundColor: 'rgba(217, 119, 6, 0.2)', borderColor: '#D97706', pointBackgroundColor: '#D97706' },
+                        { label: '橙色', data: colorData.orange.radarScores, backgroundColor: 'rgba(234, 88, 12, 0.2)', borderColor: '#EA580C', pointBackgroundColor: '#EA580C' },
+                        { label: '藍色', data: colorData.blue.radarScores, backgroundColor: 'rgba(2, 132, 199, 0.2)', borderColor: '#0284C7', pointBackgroundColor: '#0284C7' },
+                        { label: '綠色', data: colorData.green.radarScores, backgroundColor: 'rgba(5, 150, 105, 0.2)', borderColor: '#059669', pointBackgroundColor: '#059669' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: '#E8DEC9' },
+                            grid: { color: '#E8DEC9' },
+                            pointLabels: { font: { size: 11, weight: 'bold' }, color: '#4A4238' },
+                            ticks: { display: false, max: 100 }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+                    }
+                }
+            });
+        }
+
+        // 2. Select Color Detail Function
+        function selectColor(colorKey) {
+            // Update Tab UI States
+            ['gold', 'orange', 'blue', 'green'].forEach(k => {
+                const btn = document.getElementById(`btn-${k}`);
+                btn.className = `tab-btn border py-3 px-3 rounded-xl text-center text-xs sm:text-sm font-semibold transition flex flex-col items-center justify-center space-y-1 shadow-sm ${
+                    k === colorKey ? `active-${k}` : 'text-warm-800 hover:bg-warm-100'
+                }`;
+            });
+
+            const data = colorData[colorKey];
+            const container = document.getElementById('color-detail-card');
+            
+            const colorClassMap = {
+                gold: 'border-amber-300 bg-amber-50/40 text-amber-900',
+                orange: 'border-orange-300 bg-orange-50/40 text-orange-900',
+                blue: 'border-blue-300 bg-blue-50/40 text-blue-900',
+                green: 'border-green-300 bg-green-50/40 text-green-900'
+            };
+
+            container.className = `bg-white rounded-2xl p-6 border-2 ${colorClassMap[colorKey]} shadow-xs transition-all duration-300`;
+
+            container.innerHTML = `
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-warm-200 pb-4 mb-4">
+                    <div>
+                        <h3 class="text-xl font-black">${data.name}</h3>
+                        <span class="text-xs font-semibold opacity-80">${data.keirsey}</span>
+                    </div>
+                    <span class="px-3 py-1 rounded-full bg-white font-bold text-xs shadow-xs border border-warm-200">
+                        ${data.symbol}
+                    </span>
+                </div>
+
+                <div class="space-y-4 text-xs sm:text-sm">
+                    <div>
+                        <span class="font-bold block text-xs uppercase tracking-wider opacity-75">🎯 核心心理渴望 (Core Need)</span>
+                        <p class="font-medium mt-0.5">${data.coreNeed}</p>
+                    </div>
+                    <div>
+                        <span class="font-bold block text-xs uppercase tracking-wider opacity-75">💎 核心自尊價值 (Core Values)</span>
+                        <p class="font-medium mt-0.5">${data.value}</p>
+                    </div>
+                    <div>
+                        <span class="font-bold block text-xs uppercase tracking-wider opacity-75">🧠 認知與決策模式 (Cognition)</span>
+                        <p class="font-medium mt-0.5">${data.cognition}</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                        <div class="p-3 rounded-xl bg-white/80 border border-warm-200">
+                            <span class="font-bold text-xs text-red-600 block">⚠️ 壓力誘因 (Stress Triggers)</span>
+                            <p class="text-xs mt-1 text-warm-800">${data.stressTrigger}</p>
+                        </div>
+                        <div class="p-3 rounded-xl bg-white/80 border border-warm-200">
+                            <span class="font-bold text-xs text-amber-700 block">⚡ 高壓退化行為 (Stress Response)</span>
+                            <p class="text-xs mt-1 text-warm-800">${data.stressBehavior}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 3. Pair Dynamic Selector Function
+        function updatePairAnalysis() {
+            const colorA = document.getElementById('select-color-a').value;
+            const colorB = document.getElementById('select-color-b').value;
+
+            const container = document.getElementById('pair-analysis-result');
+
+            if (colorA === colorB) {
+                container.innerHTML = `
+                    <div class="p-6 rounded-xl bg-warm-100 text-center border border-warm-200">
+                        <span class="text-2xl block mb-2">🪞</span>
+                        <h4 class="font-bold text-warm-900 text-base">同質色彩鏡像組合 (${colorData[colorA].name.split(' ')[0]} × 同氣質)</h4>
+                        <p class="text-xs text-warm-800 mt-2 max-w-xl mx-auto leading-relaxed">
+                            相同色彩相遇具備極高的默契與價值認同，但亦容易陷入盲目共振。例如：雙金色易陷入教條，雙橙色易無序狂奔，雙藍色易迴避衝突和稀泥，雙綠色易陷入無休止的架構爭辨。
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Standardize key pair lookup (alphabetical order)
+            const pairKey = [colorA, colorB].sort().join('-');
+            const pairInfo = pairData[pairKey] || {
+                title: `${colorData[colorA].name.split(' ')[0]} × ${colorData[colorB].name.split(' ')[0]} 相處對攻`,
+                synergy: '雙方在心理價值與行為節奏上展現互補潛力。',
+                friction: '需要注意認知溝通習慣與價值優先順序的分歧。',
+                strategy: '確立明確分工，尊重彼此底線心理需求。'
+            };
+
+            container.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-2">
+                        <span class="px-2.5 py-1 rounded-md bg-amber-100 text-amber-900 font-bold text-xs">對攻分析</span>
+                        <h3 class="text-lg font-black text-warm-900">${pairInfo.title}</h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="p-4 rounded-xl bg-emerald-50/60 border border-emerald-200">
+                            <span class="text-xs font-bold text-emerald-800 block mb-1">✨ 核心優勢與協同效益</span>
+                            <p class="text-xs text-emerald-950 leading-relaxed">${pairInfo.synergy}</p>
+                        </div>
+                        <div class="p-4 rounded-xl bg-rose-50/60 border border-rose-200">
+                            <span class="text-xs font-bold text-rose-800 block mb-1">⚡ 潛在摩擦與衝突焦點</span>
+                            <p class="text-xs text-rose-950 leading-relaxed">${pairInfo.friction}</p>
+                        </div>
+                        <div class="p-4 rounded-xl bg-sky-50/60 border border-sky-200">
+                            <span class="text-xs font-bold text-sky-800 block mb-1">🛠️ 協同調適與相處要領</span>
+                            <p class="text-xs text-sky-950 leading-relaxed">${pairInfo.strategy}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function setPair(a, b) {
+            document.getElementById('select-color-a').value = a;
+            document.getElementById('select-color-b').value = b;
+            updatePairAnalysis();
+            document.getElementById('matrix').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 4. Playbook Switcher
+        function showPlaybook(colorKey) {
+            ['gold', 'orange', 'blue', 'green'].forEach(k => {
+                const btn = document.getElementById(`pb-btn-${k}`);
+                if (k === colorKey) {
+                    btn.className = `px-4 py-2 rounded-lg font-semibold text-xs sm:text-sm bg-${k}-100 text-${k}-900 border border-${k}-300 shadow-xs`;
+                } else {
+                    btn.className = 'px-4 py-2 rounded-lg font-semibold text-xs sm:text-sm bg-warm-100 text-warm-800 hover:bg-warm-200 border border-warm-200';
+                }
+            });
+
+            const data = playbookData[colorKey];
+            const container = document.getElementById('playbook-content');
+
+            container.innerHTML = `
+                <h3 class="text-lg font-bold text-warm-900 mb-4">${data.title}</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="p-4 rounded-xl bg-emerald-50/50 border border-emerald-200 space-y-2">
+                        <span class="font-bold text-xs text-emerald-800 flex items-center space-x-1">
+                            <span>✅ 務必做到 (DOs)</span>
+                        </span>
+                        <ul class="space-y-2 pl-2">
+                            ${data.dos.map(item => `<li class="text-xs text-warm-900 flex items-start"><span class="text-emerald-600 mr-2">✓</span><span>${item}</span></li>`).join('')}
+                        </ul>
+                    </div>
+                    <div class="p-4 rounded-xl bg-rose-50/50 border border-rose-200 space-y-2">
+                        <span class="font-bold text-xs text-rose-800 flex items-center space-x-1">
+                            <span>❌ 切忌避免 (DON'Ts)</span>
+                        </span>
+                        <ul class="space-y-2 pl-2">
+                            ${data.donts.map(item => `<li class="text-xs text-warm-900 flex items-start"><span class="text-rose-600 mr-2">✕</span><span>${item}</span></li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 5. EI Dynamic Switcher
+        function toggleEI(type) {
+            const extraBtn = document.getElementById('ei-extravert-btn');
+            const introBtn = document.getElementById('ei-introvert-btn');
+
+            if (type === 'extravert') {
+                extraBtn.className = 'px-4 py-1.5 rounded-lg text-xs font-bold bg-white text-warm-900 shadow-xs';
+                introBtn.className = 'px-4 py-1.5 rounded-lg text-xs font-bold text-warm-800 hover:text-warm-900';
+            } else {
+                introBtn.className = 'px-4 py-1.5 rounded-lg text-xs font-bold bg-white text-warm-900 shadow-xs';
+                extraBtn.className = 'px-4 py-1.5 rounded-lg text-xs font-bold text-warm-800 hover:text-warm-900';
+            }
+
+            const items = eiData[type];
+            const container = document.getElementById('ei-content-grid');
+
+            const colorBadgeMap = {
+                '金色': 'bg-amber-100 text-amber-900 border-amber-300',
+                '橙色': 'bg-orange-100 text-orange-900 border-orange-300',
+                '藍色': 'bg-blue-100 text-blue-900 border-blue-300',
+                '綠色': 'bg-green-100 text-green-900 border-green-300'
+            };
+
+            container.innerHTML = items.map(item => `
+                <div class="p-4 rounded-xl bg-warm-50 border border-warm-200 space-y-2">
+                    <span class="inline-block px-2.5 py-0.5 rounded text-xs font-bold border ${colorBadgeMap[item.color]}">
+                        ${item.color}色彩 × ${type === 'extravert' ? '外向 (E)' : '內向 (I)'}
+                    </span>
+                    <p class="text-xs text-warm-800 leading-relaxed">${item.text}</p>
+                </div>
+            `).join('');
+        }
+
+        // 6. Project Lifecycle Stage Display
+        function showProjectStage(stageNum) {
+            for (let i = 1; i <= 4; i++) {
+                const btn = document.getElementById(`proj-stage-${i}`);
+                if (i === stageNum) {
+                    btn.className = 'p-3 text-left rounded-xl border-2 border-amber-500 bg-amber-50 text-amber-900 shadow-xs';
+                } else {
+                    btn.className = 'p-3 text-left rounded-xl border border-warm-200 bg-warm-50 text-warm-800 hover:bg-warm-100';
+                }
+            }
+
+            const stage = projectStages[stageNum];
+            const container = document.getElementById('project-stage-detail');
+
+            container.innerHTML = `
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-extrabold uppercase tracking-wider text-amber-700">${stage.color}</span>
+                        <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-amber-100 text-amber-900">Stage ${stageNum}</span>
+                    </div>
+                    <h4 class="text-base font-bold text-warm-900">${stage.title}</h4>
+                    <p class="text-xs text-warm-800 leading-relaxed">${stage.desc}</p>
+                    <div class="pt-3 border-t border-warm-200 text-xs font-semibold text-warm-900">
+                        📌 階段核心關鍵任務：<span class="font-normal text-warm-800">${stage.action}</span>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
